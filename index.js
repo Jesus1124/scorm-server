@@ -29,12 +29,14 @@ app.get("/scorm", (req, res) => {
   zipURL = fullUrl.split("?");
   zipURL.shift();
   zipURL = zipURL.join("?").substr(4);
-  let extractedDirName = "scormCourse";
+  let idx1 = zipURL.indexOf("%2F") + 3,
+    idx2 = zipURL.indexOf(".zip");
+  let extractedDirName = zipURL.substr(idx1, idx2 - idx1);
   let unzipPipe = unzip.Extract({
     path: __dirname + `/scormContent/${extractedDirName}`,
   });
 
-  unzipPipe.on("close", function () {
+  function returnTo() {
     let file = __dirname + `/scormContent/${extractedDirName}/imsmanifest.xml`;
 
     fs.readFile(file, function (err, data) {
@@ -46,11 +48,16 @@ app.get("/scorm", (req, res) => {
       );
       navTreeMap.set(extractedDirName, navTree);
 
-      return setTimeout(
-        () => res.redirect("scormPlayer.html?contentID=scormCourse"),
-        1000
-      );
+      return res.redirect(`scormPlayer.html?contentID=${extractedDirName}`);
     });
+  }
+  if (fs.existsSync(__dirname + `/scormContent/${extractedDirName}`)) {
+    console.log("Already Exist");
+    return returnTo();
+  }
+
+  unzipPipe.on("close", function () {
+    return returnTo();
   });
 
   request(zipURL).pipe(unzipPipe);

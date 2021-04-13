@@ -70,7 +70,9 @@ $(document).ready(function () {
 
   $.get("/navTree", { contentID: contentID }, function (navData) {
     console.log(JSON.stringify(navData));
-    createNavList(navData);
+    if (navData.length === 1 && navData[0].children.length === 1) {
+      $("#contentNav").css("display", "none");
+    } else createNavList(navData);
     // Note: comment createNavList and uncomment the line below to auto run the first SCO
     $("#content").attr("src", navData[0].children[0].link);
     console.log(navData, navData[0].children[0].link);
