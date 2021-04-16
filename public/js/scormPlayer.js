@@ -79,9 +79,22 @@ $(document).ready(function () {
     prev_status = completion_status;
   }, 1000);
 
-  window.GetStudentName = function () {
-    return "Jesus, Espitia";
-  };
+  window.addEventListener("message", function (event) {
+    console.log("MESSAGE_RECEIVED", event.data);
+    const eventData = JSON.parse(event.data);
+    if (eventData.type === "student_data") {
+      window.GetStudentName = function () {
+        return eventData.value.name.split(" ").join(",");
+      };
+    }
+  });
+
+  window.parent.postMessage(
+    JSON.stringify({
+      type: "get_student_data",
+    }),
+    "*"
+  );
 
   $("body").on("click", ".navLink", function (evt) {
     evt.preventDefault();
