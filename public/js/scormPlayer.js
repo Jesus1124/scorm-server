@@ -58,6 +58,30 @@ $(document).ready(function () {
 
   //This is where content providers will look for the SCORM RTE
   window.API_1484_11 = new SCOBot_API_1484_11();
+  let prev_status = undefined;
+  setInterval(function () {
+    let completion_status = window.API_1484_11.GetValue(
+      "cmi.completion_status"
+    );
+
+    console.log("COMPLETION____________________", completion_status);
+
+    if (completion_status !== prev_status) {
+      window.parent.postMessage(
+        JSON.stringify({
+          type: "completion_status",
+          value: completion_status,
+        }),
+        "*"
+      );
+    }
+
+    prev_status = completion_status;
+  }, 1000);
+
+  window.GetStudentName = function () {
+    return "Jesus, Espitia";
+  };
 
   $("body").on("click", ".navLink", function (evt) {
     evt.preventDefault();
