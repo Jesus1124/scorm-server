@@ -80,11 +80,12 @@ $(document).ready(function () {
   }, 1000);
 
   window.addEventListener("message", function (event) {
-    console.log("MESSAGE_RECEIVED", event.data);
     const eventData = JSON.parse(event.data);
     if (eventData.type === "student_data") {
       window.GetStudentName = function () {
-        return eventData.value.name.split(" ").join(",");
+        let userStr = eventData.value.name;
+        if (!userStr) userStr = eventData.value.email;
+        return "," + userStr + ",";
       };
     }
   });
